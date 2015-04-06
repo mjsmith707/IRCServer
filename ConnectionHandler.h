@@ -9,28 +9,24 @@
 #ifndef __IRCServer__ConnectionHandler__
 #define __IRCServer__ConnectionHandler__
 
+#include <set>
+#include <thread>
+#include <atomic>
 #include "Config.h"
 #include "Logger.h"
-#include "Socket.h"
 #include "Client.h"
-#include "CommandHandler.h"
-#include <thread>
-#include <vector>
-#include <atomic>
 
 class ConnectionHandler {
     private:
         Config* config;
         Logger* log;
-        CommandHandler* cmdhandler;
-        std::vector<Client*> clients;
+        std::set<Client*> clients;
         std::thread listenthread;
         std::atomic<bool> running;
-    
         void threadmain();
         void handleConnection(TCPSocket*);
     public:
-        ConnectionHandler(Config*&, Logger*&, CommandHandler*&);
+        ConnectionHandler(Config*&, Logger*&);
         ~ConnectionHandler();
         void run();
         void closeConnection(Client*&);

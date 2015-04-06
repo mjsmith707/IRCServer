@@ -11,31 +11,29 @@
 
 #include <thread>
 #include <atomic>
+#include <cstring>
 #include "Socket.h"
 #include "Shared_Queue.h"
 #include "Config.h"
 #include "Logger.h"
-#include "CommandHandler.h"
+#include "IRCMsg.h"
 
 class Client {
+    typedef std::tuple<size_t, std::string> chatmsg;
     private:
         Config* config;
         Logger* log;
         std::thread connthread;
-        Shared_Queue msgQueue;
+        Shared_Queue<chatmsg> msgQueue;
         std::atomic<bool> running;
         TCPSocket* socket;
-        CommandHandler* cmdhandler;
-        size_t clientid;
         void writeSocket();
         void readSocket();
         void threadmain();
     public:
-        Client(size_t, Config*&, Logger*&, TCPSocket*&, CommandHandler*&);
+        Client(Config*&, Logger*&, TCPSocket*&);
         ~Client();
-    size_t getClientID();
-        void sendMsg();
-        void closeConnection();
+        void sendMsg(IRCMsg&);
         void run();
 };
 

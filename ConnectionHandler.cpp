@@ -7,11 +7,14 @@
 //
 
 #include "ConnectionHandler.h"
-ConnectionHandler::ConnectionHandler(Config*& config, Logger*& log, CommandHandler*& cmdhandler) : config(config), log(log), cmdhandler(cmdhandler), running(false), listenthread() {
+ConnectionHandler::ConnectionHandler(Config*& config, Logger*& log) : config(config), log(log), running(false), listenthread() {
 }
 
 ConnectionHandler::~ConnectionHandler() {
     running = false;
+    for (auto i : clients) {
+        delete i;
+    }
     if (listenthread.joinable()) {
         listenthread.join();
     }
@@ -26,9 +29,9 @@ void ConnectionHandler::threadmain() {
 }
 
 void ConnectionHandler::handleConnection(TCPSocket* socket) {
-    Client* client = new Client(clients.size(), config, log, socket, cmdhandler);
+    Client* client = new Client(config, log, socket);
     client->run();
-    clients.push_back(client);
+    clients.emplace(client);
 }
 
 void ConnectionHandler::run() {
@@ -36,5 +39,6 @@ void ConnectionHandler::run() {
 }
 
 void ConnectionHandler::closeConnection(Client*& client) {
-    client->closeConnection();
+    auto it = clients.find(client);
+    
 }

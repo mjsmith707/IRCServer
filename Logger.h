@@ -4,8 +4,6 @@
 
 #ifndef LOGGER_H_
 #define LOGGER_H_
-#include "../header/constants.h"
-#include "../header/config.h"
 #include <atomic>
 #include <thread>
 #include <chrono>
@@ -19,6 +17,7 @@
 #include <ctime>
 #include <mutex>
 #include <memory>
+#include "Config.h"
 
 class Logger {
     private:

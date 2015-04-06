@@ -47,7 +47,7 @@ void Logger::run() {
             running = false;
             return;
         }
-        std::this_thread::sleep(std::posix_time::milliseconds(500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 
     // Flush remaining messages.
@@ -84,113 +84,11 @@ void Logger::setConfig(Config* configuration) {
     runningConfig = configuration;
 }
 
-/*
-void Logger::sendMsg(const char* strFormat, ...) {
-    std::lock_guard<std::mutex> lock(msgMute);
-    va_list varArgs;
-    va_start(varArgs, strFormat);
-    try {
-        std::string formatStr = strFormat;
-        std::string message = "";
 
-        for (unsigned int i=0; i<formatStr.length(); i++) {
-            if (formatStr.at(i) == '%') {
-                if (i+1 < formatStr.length()) {
-                    if (formatStr[i+1] == 'f') {
-                        double var = va_arg(varArgs, double);
-                        message += doubleToString(var);
-                        i++;
-                    }
-                    else if (formatStr[i+1] == 'd') {
-                        int var = va_arg(varArgs, int);
-                        message += intToString(var);
-                        i++;
-                    }
-                    else if (formatStr[i+1] == 'u') {
-                        unsigned int var = va_arg(varArgs, unsigned int);
-                        message += uintToString(var);
-                        i++;
-                    }
-                    else if (formatStr[i+1] == 'l') {
-                        if (i+2 < formatStr.length()) {
-                            if (formatStr[i+2] == 'd') {
-                                long var = va_arg(varArgs, long);
-                                message += longToString(var);
-                                i=i+2;
-                            }
-                        }
-                    }
-                    else if (formatStr[i+1] == 'c') {
-                        char var = va_arg(varArgs, int);
-                        message += var;
-                        i++;
-                    }
-                    else if (formatStr[i+1] == 's') {
-                        char* var = va_arg(varArgs, char*);
-                        for (int j=0; var[j] != '\0'; j++) {
-                            message += var[j];
-                        }
-                        i++;
-                    }
-                    else {
-                        message += formatStr.at(i);
-                    }
-                }
-            }
-            else {
-                message += formatStr.at(i);
-            }
-        }
-        va_end(varArgs);
-        messageList.push(message);
-        return;
-    }
-    catch (std::exception e) {
-        va_end(varArgs);
-        if (!runningConfig->getDaemon()) {
-            if (runningConfig->getDebug()) {
-                std::cerr << "DEBUG: Something bad just happened in sendMsg(). Error: " << e.what() << std::endl;
-            }
-        }
-    }
-}
-*/
 
 void Logger::sendMsg(std::string message) {
 	std::lock_guard<std::mutex> lock(msgMute);
 	messageList.push(message);
-}
-
-std::string Logger::doubleToString(double& val) {
-    std::string str = "";
-    char tmpstr[256];
-    sprintf(tmpstr, "%f", val);
-    str = tmpstr;
-    return str;
-}
-
-std::string Logger::intToString(int& val) {
-    std::string str = "";
-    char tmpstr[256];
-    sprintf(tmpstr, "%d", val);
-    str = tmpstr;
-    return str;
-}
-
-std::string Logger::uintToString(unsigned int& val) {
-    std::string str = "";
-    char tmpstr[256];
-    sprintf(tmpstr, "%u", val);
-    str = tmpstr;
-    return str;
-}
-
-std::string Logger::longToString(long& val) {
-    std::string str = "";
-    char tmpstr[256];
-    sprintf(tmpstr, "%ld", val);
-    str = tmpstr;
-    return str;
 }
 
 bool Logger::writeMsg(std::string& message) {
@@ -214,7 +112,7 @@ bool Logger::writeMsg(std::string& message) {
     }
     catch (std::runtime_error e) {
         if (!runningConfig->getDaemon()) {
-            std::cerr << "ERROR: " << e.what() << std::cerr;
+            //std::cerr << "ERROR: " << e.what() << std::cerr;
         }
         return false;
     }

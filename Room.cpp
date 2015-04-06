@@ -7,3 +7,21 @@
 //
 
 #include "Room.h"
+
+Room::Room() {
+    
+}
+
+void Room::joinRoom(Client*& client) {
+    clients.emplace(client);
+}
+
+void Room::leaveRoom(Client*& client) {
+    clients.erase(client);
+}
+
+void Room::sendMsg(IRCMsg& msg) {
+    for (auto i : clients) {
+        i->sendMsg(msg);
+    }
+}

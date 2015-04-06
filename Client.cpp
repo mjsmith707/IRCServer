@@ -8,10 +8,15 @@
 
 #include "Client.h"
 
-Client::Client(size_t clientid, Config*& config, Logger*& log, TCPSocket*& socket, CommandHandler*& cmdhandler) : config(config), log(log), running(false), connthread(), socket(socket), cmdhandler(cmdhandler) {
+Client::Client(Config*& config, Logger*& log, TCPSocket*& socket) : config(config), log(log), running(false), connthread(), socket(socket) {
 }
 
 Client::~Client() {
+    if (socket != nullptr) {
+        log->sendMsg("Closing connection to: " + socket->getForeignAddress());
+        socket->send("goodbye", 7);
+        delete socket;
+    }
     running = false;
     if (connthread.joinable()) {
         connthread.join();
@@ -21,7 +26,7 @@ Client::~Client() {
 void Client::threadmain() {
     running = true;
     try {
-        log->sendMsg("New Connection From: " + socket->getForeignAddress());
+        log->sendMsg("New connection from: " + socket->getForeignAddress());
     }
     catch (SocketException e) {
         std::string err = "Client Error: ";
@@ -34,10 +39,6 @@ void Client::threadmain() {
     }
 }
 
-size_t Client::getClientID() {
-    return clientid;
-}
-
 void Client::writeSocket() {
     
 }
@@ -46,11 +47,7 @@ void Client::readSocket() {
     
 }
 
-void Client::sendMsg() {
-    
-}
-
-void Client::closeConnection() {
+void Client::sendMsg(IRCMsg& msg) {
     
 }
 
